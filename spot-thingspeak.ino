@@ -8,6 +8,7 @@
 
 // Third-party libraries
 
+
 // Mono Wireless TWELITE Wings API
 #include <MWings.h>
 
@@ -89,6 +90,7 @@ void loop() {
         WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
         lastTimeReconnected = millis();
     }
+
     // Reboot every x interval
     if (millis() > REBOOT_INTERVAL * 1000) {
         Serial.println("Rebooting...");
@@ -116,10 +118,12 @@ void initWiFi() {
     Serial.print("\nConnecting to the WiFi network ");
     Serial.print(WIFI_SSID);
     Serial.println("...");
+
     // Begin
     WiFi.mode(WIFI_STA);
     WiFi.setAutoReconnect(true);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
     // Wait for connection
     Serial.print("Connecting.");
     while (WiFi.status() != WL_CONNECTED) {
@@ -134,6 +138,7 @@ void initWiFi() {
         }
     }
     Serial.println("\nConnected!");
+
     // Set Root CA certificate
     client.setCACert(CA_CERT);
 }
@@ -159,14 +164,9 @@ void sendAriaData(const DataFromAria& data)
         Serial.println("Connecting to the server...");
         if (not client.connect(SERVER_HOST, SERVER_PORT, CONNECT_TIMEOUT * 1000)) {
             Serial.println("Connection failed!");
-            char err_buf[100];
-            if (client.lastError(err_buf, 100) < 0) {
-                Serial.println(err_buf);
-            } else {
-                Serial.println("Connection error");
-            }
         } else {
             Serial.println("Connected to the server!");
+
             // Make a query string for the Channel on the ThingSpeak
             char queries[QUERIES_MAX_LENGTH+1];
             snprintf(queries, sizeof(queries),
@@ -198,7 +198,7 @@ void sendAriaData(const DataFromAria& data)
             while (client.connected()) {
                 String line = client.readStringUntil('\n');
                 if (line == "\r") {
-                    Serial.println("Headers received");
+                    Serial.print("Index (if succeeded): ");
                     break;
                 }
                 if (millis() - timeSentRequest > REQUEST_TIMEOUT * 1000) {
